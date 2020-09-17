@@ -2,3 +2,18 @@ language: go
 
 go:
 - 1.14.x
+
+deploy:
+  provider: releases
+  api_key: $GTOKEN
+  file: helloworld
+  skip_cleanup: true
+  on:
+    tags: true
+
+jobs:
+  include:
+    - stage: test
+      script: scripts/test.sh
+    - stage: build
+      script: scripts/build.sh
