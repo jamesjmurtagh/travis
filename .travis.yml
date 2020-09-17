@@ -3,6 +3,10 @@ language: go
 go:
 - 1.14.x
 
+before_deploy:
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then chmod +x scripts/keychain.sh; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then ./scripts/keychain.sh; fi
+
 deploy:
   provider: releases
   api_key: $GTOKEN
@@ -24,4 +28,6 @@ jobs:
       script: scripts/build.sh
     - stage: build
       os: osx
-      script: scripts/build.sh
+      script: 
+        - scripts/build.sh
+        - codesign -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil
