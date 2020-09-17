@@ -7,9 +7,9 @@ deploy:
   provider: releases
   api_key: $GTOKEN
   file: 
-    - vorteil-windows.exe
-    - vorteil-linux
-    - vorteil-darwin
+    - vorteil_windows-x86.zip
+    - vorteil_linux-x86.tar.gz
+    - vorteil_darwin-x86.tar.gz
   skip_cleanup: true
   draft: true
   on:

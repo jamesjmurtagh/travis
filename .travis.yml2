@@ -1,0 +1,33 @@
+language: go
+
+go:
+- 1.14.x
+
+#deploy:
+#  provider: releases
+#  api_key: $GITHUB_TOKEN
+#  file: 
+#    - kernel-$TRAVIS_TAG
+#    - kernel-$TREAVIS_TAG.asc
+#  skip_cleanup: true
+#  draft: true
+#  on:
+#    tags: true
+
+jobs:
+  include:
+    - stage: test
+      script: scripts/test.sh
+    - stage: build
+      script: scripts/build.sh
+    - stage: deploy
+      script:
+        - make dependencies
+        - make bundle
+        - echo $GKEY > gkey64
+        - base64 -d ./gkey64 > ./gkey 
+        - gcloud auth activate-service-account --key-file ./gkey 
+        - gpg --armor --local-user &GPG_ID --detach-sigh kernel-$TRAVIS_TAG
+        - gsutil cp kernel-$TRAVIS_TAG gs://vorteil-dl/kernels/kernels/kernel-$TRAVIS_TAG
+        - gsutil cp kernel-$TRAVIS_TAG.asc gs://vorteil-dl/kernels/kernels/kernel-$TRAVIS_TAG.asc
+        - gsutil cp manifest.txt gs://vorteil-dl/kernels/manifest.txt
