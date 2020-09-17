@@ -8,6 +8,7 @@ deploy:
   api_key: $GTOKEN
   file: helloworld
   skip_cleanup: true
+  draft: true
   on:
     tags: true
 
