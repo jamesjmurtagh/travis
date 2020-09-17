@@ -3,10 +3,6 @@ language: go
 go:
 - 1.14.x
 
-before_deploy:
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then chmod +x scripts/keychain.sh; fi
-  - if [ "$TRAVIS_OS_NAME" = osx ]; then ./scripts/keychain.sh; fi
-
 deploy:
   provider: releases
   api_key: $GTOKEN
@@ -25,7 +21,8 @@ jobs:
       script: scripts/test.sh
     - stage: build
       os: linux
-      script: 
+      script:
+        - scripts/keychain.sh 
         - scripts/build.sh
         - zip vorteil_windows-x86.zip vorteil.exe && rm vorteil.exe
         - tar -zcvf vorteil_linux-x86.tar.gz vorteil && rm vorteil
