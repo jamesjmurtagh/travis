@@ -20,4 +20,8 @@ jobs:
     - stage: test
       script: scripts/test.sh
     - stage: build
+      os: linux
+      script: scripts/build.sh
+    - stage: build
+      os: osx
       script: scripts/build.sh
