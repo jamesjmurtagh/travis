@@ -6,7 +6,10 @@ go:
 deploy:
   provider: releases
   api_key: $GTOKEN
-  file: helloworld
+  file: 
+    - windows/vorteil.exe
+    - linux/vorteil
+    - darwin/vorteil
   skip_cleanup: true
   draft: true
   on:
