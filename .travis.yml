@@ -22,13 +22,13 @@ jobs:
     - stage: build
       os: linux
       script:
-        - scripts/keychain.sh 
         - scripts/build.sh
         - zip vorteil_windows-x86.zip vorteil.exe && rm vorteil.exe
         - tar -zcvf vorteil_linux-x86.tar.gz vorteil && rm vorteil
     - stage: build
       os: osx
-      script: 
+      script:
+        - scripts/keychain.sh 
         - scripts/build.sh
         - codesign -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil
         - tar -zcvf vorteil_darwin-x86.tar.gz vorteil && rm vorteil
