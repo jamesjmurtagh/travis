@@ -42,6 +42,7 @@ jobs:
         - rm -fr *.p12
         - scripts/build.sh
         - codesign -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil
-        - xcrun altool --notarize-app  --file $(pwd)/vorteil --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW
-        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
-        - tar -zcvf vorteil_darwin-x86.tar.gz vorteil && rm vorteil
+        - zip vorteil_darwin-x86.zip vorteil 
+        - xcrun altool --notarize-app  --file $(pwd)/vorteil_darwin-x86.zip --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW
+        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.zip; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
+        # - tar -zcvf vorteil_darwin-x86.tar.gz vorteil && rm vorteil
