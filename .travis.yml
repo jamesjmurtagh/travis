@@ -41,6 +41,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k travis $KEY_CHAIN
         - rm -fr *.p12
         - scripts/build.sh
+        - codesign -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil
         - mkdir -p build && mv vorteil build/
         - hdiutil create ./vorteil_darwin-x86.dmg -ov -volname "Vorteil CLI" -fs HFS+ -srcfolder ./build/
         - codesign --force --deep -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil_darwin-x86.dmg
