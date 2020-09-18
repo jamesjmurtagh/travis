@@ -46,4 +46,4 @@ jobs:
         - hdiutil create ./vorteil_darwin-x86.dmg -ov -volname "Vorteil CLI" -fs HFS+ -srcfolder ./build/
         - codesign --force --deep -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil_darwin-x86.dmg
         - xcrun altool --notarize-app  --file $(pwd)/vorteil_darwin-x86.dmg --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW --
-        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.dmg; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
+        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.dmg; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; else exit 0; fi; done
