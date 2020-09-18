@@ -1,12 +1,5 @@
 language: go
 
-matrix:
-  include:
-  - os: osx
-    osx_image: "xcode11.3"
-  - os: linux
-    dist: bionic
-
 go:
 - 1.14.x
 
@@ -28,12 +21,14 @@ jobs:
       script: scripts/test.sh
     - stage: build
       os: linux
+      dist: bionic
       script:
         - scripts/build.sh
         - zip vorteil_windows-x86.zip vorteil.exe && rm vorteil.exe
         - tar -zcvf vorteil_linux-x86.tar.gz vorteil && rm vorteil
     - stage: build
       os: osx
+      osx_image: "xcode11.3"
       script:
         - export KEY_CHAIN=build.keychain
         - export CERTIFICATE_P12=certificate.p12
