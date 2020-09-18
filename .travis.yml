@@ -1,5 +1,12 @@
 language: go
 
+matrix:
+  include:
+  - os: osx
+    osx_image: "xcode11.3"
+  - os: linux
+    dist: bionic
+
 go:
 - 1.14.x
 
