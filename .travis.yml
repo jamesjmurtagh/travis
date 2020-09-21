@@ -17,6 +17,7 @@ jobs:
       os: linux
       dist: bionic
       before_install:
+          - echo $TRAVIS_PULL_REQUEST
           - sudo apt-get -y install libseccomp-dev
           - go get -t -v ./...
       before_script:
