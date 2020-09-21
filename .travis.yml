@@ -5,18 +5,6 @@ language: go
 go:
   - 1.15
 
-deploy:
-  provider: releases
-  api_key: $GTOKEN
-  file:
-    - vorteil_darwin-x86.dmg
-    - vorteil_windows-x86.zip
-    - vorteil_linux-x86.tar.gz
-  skip_cleanup: true
-  draft: true
-  on: 
-    tags: true
-
 jobs:
   include:
     - stage: build
@@ -34,11 +22,20 @@ jobs:
         # - go build -o vorteil github.com/vorteil/vorteil/cmd/vorteil
         - GOOS=windows go build -o vorteil.exe main.go
         - go test -coverprofile c.out ./...
-      after_script:
         - zip vorteil_windows-x86.zip vorteil.exe
         - tar -zcvf vorteil_linux-x86.tar.gz vorteil
       after_success:
         - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+      deploy:
+        provider: releases
+        api_key: $GTOKEN
+        file:
+          - vorteil_windows-x86.zip
+          - vorteil_linux-x86.tar.gz
+        skip_cleanup: true
+        draft: true
+        on:
+          tags: true
     - stage: build
       os: osx
       osx_image: "xcode11.3"
@@ -64,3 +61,12 @@ jobs:
         - codesign --force --deep -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil_darwin-x86.dmg
         - xcrun altool --notarize-app --file $(pwd)/vorteil_darwin-x86.dmg --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW -- >> /dev/null
         - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.dmg >> /dev/null; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
+      deploy:
+        provider: releases
+        api_key: $GTOKEN
+        file:
+          - vorteil_darwin-x86.dmg
+        skip_cleanup: true
+        draft: true
+        on: 
+          tags: true
