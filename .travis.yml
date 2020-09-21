@@ -1,49 +1,73 @@
+dist: bionic
+
 language: go
 
 go:
-- 1.14.x
-
-deploy:
-  provider: releases
-  api_key: $GTOKEN
-  file: 
-    - vorteil_windows-x86.zip
-    - vorteil_linux-x86.tar.gz
-    - vorteil_darwin-x86.dmg
-  skip_cleanup: true
-  draft: true
-  on:
-    tags: true
+  - 1.15
 
 jobs:
   include:
-    - stage: test
-      script: scripts/test.sh
     - stage: build
       os: linux
       dist: bionic
+      before_install:
+        - sudo apt-get -y install libseccomp-dev
+        - go get -t -v ./...
+      before_script:
+        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+        - chmod +x ./cc-test-reporter
+        - ./cc-test-reporter before-build
       script:
-        - scripts/build.sh
-        - zip vorteil_windows-x86.zip vorteil.exe && rm vorteil.exe
-        - tar -zcvf vorteil_linux-x86.tar.gz vorteil && rm vorteil
+        - go build -o vorteil main.go
+        # - go build -o vorteil github.com/vorteil/vorteil/cmd/vorteil
+        - GOOS=windows go build -o vorteil.exe main.go
+        - go test -coverprofile c.out ./...
+      after_script:
+        - zip vorteil_windows-x86.zip vorteil.exe
+        - tar -zcvf vorteil_linux-x86.tar.gz vorteil
+      after_success:
+        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+      deploy:
+        provider: releases
+        api_key: $GTOKEN
+        file:
+          - vorteil_windows-x86.zip
+          - vorteil_linux-x86.tar.gz
+        skip_cleanup: true
+        draft: true
+        on:
+          tags: true
     - stage: build
       os: osx
       osx_image: "xcode11.3"
-      script:
+      before_install:
+        - go get -t -v ./...
+      before_script:
         - export KEY_CHAIN=build.keychain
         - export CERTIFICATE_P12=certificate.p12
-        - echo $OSX_DEVELOPER_ID_P12 | base64 --decode > $CERTIFICATE_P12
-        - security create-keychain -p travis $KEY_CHAIN
+        - echo $OSX_P12_CERT | base64 --decode > $CERTIFICATE_P12
+        - security create-keychain -p travis &KEY_CHAIN
         - security default-keychain -s $KEY_CHAIN
         - security unlock-keychain -p travis $KEY_CHAIN
-        - security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $OSX_DEVELOPER_ID_PW -T /usr/bin/codesign
+        - security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $OSX_P12_PW -T /usr/bin/codesign
         - |-
           security set-key-partition-list -S apple-tool:,apple: -s -k travis $KEY_CHAIN
         - rm -fr *.p12
-        - scripts/build.sh
+      script:
+        # - go build -o vorteil github.com/vorteil/vorteil/cmd/vorteil
+        - go build -o vorteil main.go
         - codesign -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil
         - mkdir -p build && mv vorteil build/
         - hdiutil create ./vorteil_darwin-x86.dmg -ov -volname "Vorteil CLI" -fs HFS+ -srcfolder ./build/
         - codesign --force --deep -s $OSX_APP_SIGN_ID -v --timestamp --options runtime vorteil_darwin-x86.dmg
-        - xcrun altool --notarize-app  --file $(pwd)/vorteil_darwin-x86.dmg --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW --
-        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.dmg; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
+        - xcrun altool --notarize-app --file $(pwd)/vorteil_darwin-x86.dmg --username $OSX_NOTARIZE_USERNAME --primary-bundle-id com.vorteil.cli -p $OSX_NOTARIZE_PW -- >> /dev/null
+        - for ((i=1;i<=30;i+=1)); do xcrun stapler staple $(pwd)/vorteil_darwin-x86.dmg >> /dev/null; if [ $? = 65 ]; then echo "Waiting for notarization to complete..." && sleep 10; fi; done
+      deploy:
+        provider: releases
+        api_key: $GTOKEN
+        file:
+          - vorteil_darwin-x86.dmg
+        skip_cleanup: true
+        draft: true
+        on: 
+          tags: true
