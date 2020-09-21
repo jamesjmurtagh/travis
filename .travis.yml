@@ -10,7 +10,7 @@ stages:
     if: branch = master AND \
     type = pull_request
   - name: release
-    if: branch = master AND type = push AND fork = false
+    if: branch = master
 
 jobs:
   include:
