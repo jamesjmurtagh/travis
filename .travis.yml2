@@ -2,8 +2,8 @@ language: go
 
 go:
 - 1.14.x
-
-#deploy:
+ 
+#deploy:asd asd
 #  provider: releases
 #  api_key: $GITHUB_TOKEN
 #  file: 
