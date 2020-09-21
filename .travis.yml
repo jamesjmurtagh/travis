@@ -45,11 +45,11 @@ jobs:
       before_script:
         - export KEY_CHAIN=build.keychain
         - export CERTIFICATE_P12=certificate.p12
-        - echo $OSX_P12_CERT | base64 --decode > $CERTIFICATE_P12
+        - echo $OSX_DEVELOPER_ID_P12 | base64 --decode > $CERTIFICATE_P12
         - security create-keychain -p travis $KEY_CHAIN
         - security default-keychain -s $KEY_CHAIN
         - security unlock-keychain -p travis $KEY_CHAIN
-        - security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $OSX_P12_PW -T /usr/bin/codesign
+        - security import $CERTIFICATE_P12 -k $KEY_CHAIN -P $OSX_DEVELOPER_ID_P12 -T /usr/bin/codesign
         - |-
           security set-key-partition-list -S apple-tool:,apple: -s -k travis $KEY_CHAIN
         - rm -fr *.p12
