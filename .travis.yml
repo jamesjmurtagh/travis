@@ -8,8 +8,7 @@ go:
 stages:
   - name: test
   - name: release
-    if: branch = master
-    env: TRAVIS_PULL_REQUEST=false
+    if: branch = master AND type = push AND fork = false
 
 jobs:
   include:
@@ -17,7 +16,6 @@ jobs:
       os: linux
       dist: bionic
       before_install:
-          - echo $TRAVIS_PULL_REQUEST
           - sudo apt-get -y install libseccomp-dev
           - go get -t -v ./...
       before_script:
