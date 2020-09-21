@@ -14,20 +14,20 @@ stages:
 
 jobs:
   include:
-    - stage: dryrun
-      os: linux
-      dist: bionic
-      before_install:
-          - sudo apt-get -y install libseccomp-dev
-          - go get -t -v ./...
-      before_script:
-        - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-        - chmod +x ./cc-test-reporter
-        - ./cc-test-reporter before-build
-      script: 
-        - go test -coverprofile c.out ./...
-      after_success:
-        - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+    # - stage: dryrun
+    #   os: linux
+    #   dist: bionic
+    #   before_install:
+    #       - sudo apt-get -y install libseccomp-dev
+    #       - go get -t -v ./...
+    #   before_script:
+    #     - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+    #     - chmod +x ./cc-test-reporter
+    #     - ./cc-test-reporter before-build
+    #   script: 
+    #     - go test -coverprofile c.out ./...
+    #   after_success:
+    #     - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
     - stage: release
       os: linux
       dist: bionic
@@ -56,8 +56,7 @@ jobs:
         skip_cleanup: true
         draft: true
         on:
-          tags: true
-          
+          tags: true      
     - stage: release
       os: osx
       osx_image: "xcode11.3"
