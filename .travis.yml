@@ -6,13 +6,15 @@ go:
   - 1.15
 
 stages:
-  - name: test
+  - name: dryrun
+    if: branch = master AND \
+    type = pull_request
   - name: release
     if: branch = master AND type = push AND fork = false
 
 jobs:
   include:
-    - stage: test
+    - stage: dryrun
       os: linux
       dist: bionic
       before_install:
@@ -55,6 +57,7 @@ jobs:
         draft: true
         on:
           tags: true
+          
     - stage: release
       os: osx
       osx_image: "xcode11.3"
